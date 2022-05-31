@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32422.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BloonsTD6.Mod.MultiUser", "BloonsTD6.Mod.MultiUser\BloonsTD6.Mod.MultiUser.csproj", "{7A3E53E5-9B67-4F1A-87B4-179ED7520CFF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A3E53E5-9B67-4F1A-87B4-179ED7520CFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A3E53E5-9B67-4F1A-87B4-179ED7520CFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A3E53E5-9B67-4F1A-87B4-179ED7520CFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A3E53E5-9B67-4F1A-87B4-179ED7520CFF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DE03E19-BF97-4F7B-81E9-6FF8ECB3DD25}
+	EndGlobalSection
+EndGlobal

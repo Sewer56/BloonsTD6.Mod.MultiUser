@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>NET472</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BloonsTD6 Mod Helper">
+      <HintPath>..\Dependencies\BloonsTD6 Mod Helper.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>..\Dependencies\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="MelonLoader">
+      <HintPath>..\Dependencies\MelonLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="UnhollowerBaseLib">
+      <HintPath>..\Dependencies\UnhollowerBaseLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Harmony">
+      <HintPath>..\Dependencies\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="NinjaKiwi.LiNK">
+      <HintPath>..\Dependencies\NinjaKiwi.LiNK.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppNewtonsoft.Json.dll">
+      <HintPath>..\Dependencies\Il2CppNewtonsoft.Json.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(BLOONSTD6_PATH)/Mods" ContinueOnError="true" />
+  </Target>
+
+</Project>
