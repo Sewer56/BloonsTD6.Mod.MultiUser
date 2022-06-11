@@ -9,16 +9,23 @@ Multi User is a mod for Bloons TD 6 that allows you to run multiple copies of Bl
 You can find the download for the mod in the [Releases Section on GitHub](https://github.com/Sewer56/BloonsTD6.Mod.MultiUser//releases/latest).  
 Simply extract the DLL to your `Mods` directory.  
 
+## Warning
+
+⚠️ RISK OF DATA LOSS.
+
+Before using this mod, consider creating a backup of your save data contained in:
+- `Steam/userdata/<user-id>/960090`  
+
 ## Usage
 
 In order to use an alternative profile:  
 - Create a game shortcut.  
-- Add desired flags (see below).    
-- Launch game.
+- Add desired flags (see below).  
+- Launch game.  
 
 ![Example Usage](./docs/images/UsageExample.png)
 
-In this example, adding `--profile Sewer56` will make the game use an alternative account associated with the name `Sewer56`.  This can be any account. Using the same shortcut again will 
+In this example, adding `--profile Sewer56` will make the game use an alternative account associated with the name `Sewer56`.  When you boot into the game you'll be prompted to log-in; and you use the same shortcut in the future, you will be automatically logged into that account.  
 
 ### List of Available Flags
 
@@ -27,9 +34,9 @@ In this example, adding `--profile Sewer56` will make the game use an alternativ
 
 ## Features List
 
-✅ indicates a feature is implemented. 
+✅ indicates a feature is implemented.  
 ⚠️ indicates a feature is not yet complete.  
-❌ indicates a feature is not yet implemented. 
+❌ indicates a feature is not yet implemented.   
 
 - ✅ Multiple Instances of Game At Once.  
 - ✅ Test Co-Op Mods without Another PC.  
