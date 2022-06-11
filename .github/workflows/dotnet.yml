@@ -54,7 +54,7 @@ jobs:
       run: |
         if ($env:IS_RELEASE -eq 'true') 
         {
-            auto-changelog --sort-commits date --hide-credit --template keepachangelog --commit-limit false --unreleased --starting-version "$env:RELEASE_TAG" --output "$env:CHANGELOG_PATH"
+            auto-changelog --sort-commits date --hide-credit --template keepachangelog --commit-limit false --starting-version "$env:RELEASE_TAG" --output "$env:CHANGELOG_PATH"
         }
         else 
         {
