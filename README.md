@@ -25,12 +25,16 @@ In order to use an alternative profile:
 
 ![Example Usage](./docs/images/UsageExample.png)
 
-In this example, adding `--profile Sewer56` will make the game use an alternative account associated with the name `Sewer56`.  When you boot into the game you'll be prompted to log-in; and you use the same shortcut in the future, you will be automatically logged into that account.  
+In this example, adding `--profile Sewer56 --save Sewer56` will make the game use an alternative account associated with the name `Sewer56`.  When you boot into the game you'll be prompted to log-in. When you use the same shortcut in the future, you will be automatically logged into that account with its own separate save file.  
 
 ### List of Available Flags
 
 `--profile ProfileName`: Specifies an alternative account to use.  
 `--save SaveName`: Specifies an alternative save file to use.  
+
+It is recommended to specify both `--profile` and `--save`; unless your intention is to share the same save file between multiple accounts (co-op with self).  
+
+Note: *This mod will likely get you hacker pooled and (by design) cannot be used to circumvent the hacker pool.*  
 
 ## Features List
 
