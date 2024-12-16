@@ -14,12 +14,15 @@
     <Reference Include="Il2CppInterop.Common">
       <HintPath>$(BloonsTD6)\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
     </Reference>
-    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.29"/>
+    <Reference Include="Il2CppNinjaKiwi.LiNK">
+      <HintPath>E:\SteamLibrary\steamapps\common\BloonsTD6\MelonLoader\Il2CppAssemblies\Il2CppNinjaKiwi.LiNK.dll</HintPath>
+    </Reference>
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.29" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Reloaded.Memory.Sigscan" Version="3.1.9" />
   </ItemGroup>
 
-  <Import Project="..\..\..\btd6.targets"/>
+  <Import Project="..\..\..\btd6.targets" />
 </Project>

@@ -2,33 +2,23 @@
 
 namespace BloonsTD6.Mod.MultiUser;
 
-public class UnityPlayerPatcher
-{   
+public class UnityPlayerPatcher(string lastVersionFilePath, string gameFolderPath) {   
     /// <summary>
     /// File path to the game folder.
     /// </summary>
-    public string GameFolderPath { get; private set; }
+    public string GameFolderPath { get; private set; } = gameFolderPath;
 
     /// <summary>
     /// File path to last game version
     /// </summary>
-    public string LastVersionFilePath { get; private set; }
+    public string LastVersionFilePath { get; private set; } = lastVersionFilePath;
 
-    public static string OldSPattern = "0F 84 B5 00 00 00 40 84 F6 40 0F 94 C6";
-
-    public static string ScanPattern = "0F 84 BB 00 00 00 40 84 F6 0F 94 C3 E9";
-    public static byte[] PatchBytes  = new byte[]
-    {
-        0x90, 0x90, 0x90, 0x90, 0x90, 0x90, // nop x 6
-        0xBE, 0x01, 0x00, 0x00, 0x00,       // mov esi, 1
-        0x90, 0x90                          // nop x 2
-    };
-
-    public UnityPlayerPatcher(string lastVersionFilePath, string gameFolderPath)
-    {
-        LastVersionFilePath = lastVersionFilePath;
-        GameFolderPath = gameFolderPath;
-    }
+    public static string ScanPattern = "48 8B C7 4C 8D 25 FE A4 18 01 66 0F 1F 44 00 00";
+    public static byte[] PatchBytes = [
+        0x48, 0x8B, 0xC7, // mov rax, rdi
+        0x4C, 0x8D, 0x25, 0xCE, 0xA4, 0x18, 0x01, // lea r12,[rip+0x118A4CE] # Updated address to player setting always false
+        0x66, 0x0F, 0x1F, 0x44, 0x00, 0x00 // nop WORD PTR [rax+rax]
+    ];
 
     /// <summary>
     /// Patches UnityPlayer if necessary.
