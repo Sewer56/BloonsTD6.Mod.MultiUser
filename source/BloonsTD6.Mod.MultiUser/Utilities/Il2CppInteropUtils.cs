@@ -1,12 +1,13 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
-using UnhollowerBaseLib;
+using HarmonyLib;
+using Il2CppInterop.Runtime;
 
 namespace BloonsTD6.Mod.MultiUser.Utilities;
 
 // Copied from my fork of Il2CppAssemblyUnhollower
 
-public class UnhollowerUtils
+public class Il2CppInteropUtils
 {
     private const string GenericDeclaringTypeName = "MethodInfoStoreGeneric_";
     private const string GenericFieldName = "Pointer";
@@ -16,7 +17,12 @@ public class UnhollowerUtils
         var body = method.GetMethodBody();
         if (body == null) throw new ArgumentException("Target method may not be abstract");
         var methodModule = method.DeclaringType.Assembly.Modules.Single();
-        foreach (var (opCode, opArg) in MiniIlParser.Decode(body.GetILAsByteArray()))
+
+        // get using reflection Il2CppInterop.Common.MiniIlParser.Decode from Il2CppInterop.Common.MiniIlParser but its an internal class
+        IEnumerable<(OpCode, long)>? ilBody = (IEnumerable<(OpCode, long)>) AccessTools.Method(typeof(Il2CppInterop.Common.Il2CppInteropUtils).Assembly.GetType("Il2CppInterop.Common.MiniIlParser"), "Decode").Invoke(null,
+            [body.GetILAsByteArray()]);
+
+        foreach ((var opCode, long opArg) in ilBody)
         {
             if (opCode != OpCodes.Ldsfld) continue;
             var fieldInfo = methodModule.ResolveField((int)opArg);

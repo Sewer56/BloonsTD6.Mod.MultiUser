@@ -25,7 +25,7 @@ internal class Il2CppNativeHookable<TDelegate> where TDelegate : MulticastDelega
     public unsafe Il2CppNativeHookable(MethodBase method)
     {
         OriginalMethod = method;
-        OriginalMethodInfoPtr = (IntPtr) UnhollowerUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
+        OriginalMethodInfoPtr = (IntPtr) Il2CppInteropUtils.GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
     }
 
     /// <summary>

@@ -1,8 +1,7 @@
 ﻿using BloonsTD6.Mod.MultiUser.Utilities;
 using Il2CppNewtonsoft.Json;
-using NinjaKiwi.Players;
-using NinjaKiwi.Players.Files;
-using UnhollowerBaseLib;
+using Il2CppInterop.Runtime;
+using Il2CppNinjaKiwi.LiNK.Client.Files;
 
 namespace BloonsTD6.Mod.MultiUser;
 
@@ -42,7 +41,7 @@ internal static class ProfileSwitcher
     public static IntPtr LoadFromFileStorageImpl(Il2CppNativeHookVariable<string> path,
         Il2CppNativeHookVariable<PasswordGenerator> passwordGenerator,
         Il2CppNativeHookVariable<JsonSerializerSettings> jsonSettings,
-        SaveStrategy saveStrategy,
+        FileSystemStorage.Strategy saveStrategy,
         bool ignoreIfNotReadable,
         IntPtr method)
     {

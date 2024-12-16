@@ -1,4 +1,4 @@
-﻿using BloonsTD6.Mod.MultiUser.SigScan;
+﻿    using Reloaded.Memory.Sigscan;
 
 namespace BloonsTD6.Mod.MultiUser;
 
@@ -14,7 +14,9 @@ public class UnityPlayerPatcher
     /// </summary>
     public string LastVersionFilePath { get; private set; }
 
-    public static string ScanPattern = "0F 84 B5 00 00 00 40 84 F6 40 0F 94 C6";
+    public static string OldSPattern = "0F 84 B5 00 00 00 40 84 F6 40 0F 94 C6";
+
+    public static string ScanPattern = "0F 84 BB 00 00 00 40 84 F6 0F 94 C3 E9";
     public static byte[] PatchBytes  = new byte[]
     {
         0x90, 0x90, 0x90, 0x90, 0x90, 0x90, // nop x 6
@@ -58,7 +60,7 @@ public class UnityPlayerPatcher
 
             if (!scan.Found)
             {
-                MelonLogger.Msg("Cannot patch UnityPlayer. Either is incompatible or already patched.");
+                MelonLogger.Error("Cannot patch UnityPlayer. Either is incompatible or already patched.");
                 HandleError();
                 return;
             }
@@ -78,6 +80,8 @@ public class UnityPlayerPatcher
             throw e;
         }
 
+        return;
+
         void HandleError() => File.Copy(unityPlayerBackupPath, unityPlayerPath, true);
     }
 
@@ -86,7 +90,7 @@ public class UnityPlayerPatcher
     /// </summary>
     private static bool NeedsPatching(string versionPath)
     {
-        if (!File.Exists(versionPath))
+        //if (!File.Exists(versionPath))
             return true;
         
         var lastVersion    = Version.Parse(File.ReadAllText(versionPath));

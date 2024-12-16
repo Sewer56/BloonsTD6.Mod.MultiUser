@@ -1,4 +1,4 @@
-﻿using UnhollowerBaseLib;
+﻿using Il2CppInterop.Runtime;
 
 namespace BloonsTD6.Mod.MultiUser.Utilities;
 
