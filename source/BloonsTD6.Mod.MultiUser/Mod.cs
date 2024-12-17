@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using AssetsTools.NET.Extra;
 using BloonsTD6.Mod.MultiUser;
 using BTD_Mod_Helper.Extensions;
 using MelonLoader.Utils;
@@ -23,7 +24,7 @@ public class Mod : BloonsTD6Mod
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            MelonLogger.Msg("OS is not Windows. Skipping patching UnityPlayer. You'll only be able to run 1 game copy at once.");
+            MelonLogger.Warning("OS is not Windows. Skipping patching UnityPlayer. You'll only be able to run 1 game copy at once.");
             return;
         }
 

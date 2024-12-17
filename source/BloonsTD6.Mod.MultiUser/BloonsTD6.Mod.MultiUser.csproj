@@ -11,11 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Reference Include="AssetsTools.NET">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\BloonsTD6\MelonLoader\net6\AssetsTools.NET.dll</HintPath>
+    </Reference>
     <Reference Include="Il2CppInterop.Common">
       <HintPath>$(BloonsTD6)\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
     </Reference>
     <Reference Include="Il2CppNinjaKiwi.LiNK">
-      <HintPath>E:\SteamLibrary\steamapps\common\BloonsTD6\MelonLoader\Il2CppAssemblies\Il2CppNinjaKiwi.LiNK.dll</HintPath>
+      <HintPath>$(BloonsTD6)\MelonLoader\Il2CppAssemblies\Il2CppNinjaKiwi.LiNK.dll</HintPath>
     </Reference>
     <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.29" />
   </ItemGroup>
