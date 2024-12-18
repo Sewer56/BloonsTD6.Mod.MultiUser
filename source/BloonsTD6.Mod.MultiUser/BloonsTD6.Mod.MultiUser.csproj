@@ -19,5 +19,11 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\ModHelperData.cs">
+      <Link>ModHelperData.cs</Link>
+    </Compile>
+  </ItemGroup>
+
   <Import Project="..\..\..\btd6.targets" />
 </Project>
