@@ -1,9 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-using BloonsTD6.Mod.MultiUser.Utilities;
-
 using HarmonyLib;
-
+using Il2CppAssets.Scripts.Unity;
+using Il2CppAssets.Scripts.Utils;
 using Il2CppInterop.Runtime;
 
 using Il2CppNewtonsoft.Json;
@@ -12,6 +11,7 @@ using Il2CppNinjaKiwi.LiNK.Client;
 using Il2CppNinjaKiwi.LiNK.Client.Files;
 
 using Il2CppSystem.Runtime.Remoting;
+using MelonLoader.NativeUtils;
 using Il2CppInteropUtils = Il2CppInterop.Common.Il2CppInteropUtils;
 
 namespace BloonsTD6.Mod.MultiUser;
@@ -29,8 +29,7 @@ internal static class ProfileSwitcher {
 
     public const string IdentityFileName = "identity";
     public const string SaveFileName = "Profile.Save";
-
-    //private static NativeHook<Hooks.FileStorage_LoadFn> _filestorageLoadHook = Hooks.LoadFromFileStorage.Hook(LoadFromFileStorageImpl).Activate();
+    
     /// <summary>
     /// Initializes this class instance.
     /// </summary>
@@ -43,42 +42,89 @@ internal static class ProfileSwitcher {
             if (commandline[x] == "--save")
                 SaveName = SanitizeFileName(commandline[x + 1]);
         }
-
-
     }
 
-    [HarmonyPatch(typeof(PlayerServiceComponent), nameof(PlayerServiceComponent.Awake))]
-    public static class PSC_A {
-        [HarmonyPostfix]
-        public static void Postfix(ref PlayerServiceComponent __instance) {
-            __instance.configuration.playerSaveFileName = SaveFileName;
-            __instance.LiNK.LoginToIdentity(new KongToken(){displayName = "Hawk Rick Tuah Rick", gameAuthToken = "Real Auth", userID = "HI NK!"});
-        }
-    }
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr LoadStorageDelegate(
+        IntPtr instance,
+        IntPtr path, //string
+        IntPtr jsonSettings, //JsonSerializerSettings
+        IntPtr ignoreIfNotReadable, //bool
+        IntPtr methodInfo
+    );
 
-    public static IntPtr LoadFromFileStorageImpl(Il2CppNativeHookVariable<string> path,
-        Il2CppNativeHookVariable<PasswordGenerator> passwordGenerator,
-        Il2CppNativeHookVariable<JsonSerializerSettings> jsonSettings,
-        FileSystemStorage.Strategy saveStrategy,
-        bool ignoreIfNotReadable,
-        IntPtr method) {
-        var filePath = path.GetObject();
+    private static NativeHook<LoadStorageDelegate> _hook;
+    private static LoadStorageDelegate _patchDelegate;
 
-        if (filePath != null) {
-            if (!string.IsNullOrEmpty(ProfileName) && filePath.EndsWith(IdentityFileName)) {
-                var newFileName = Path.Combine(Path.GetDirectoryName(filePath), $"{IdentityFileName}-{ProfileName}");
-                path.RawValue = IL2CPP.ManagedStringToIl2Cpp(newFileName);
+    public static IntPtr LoadStorage(IntPtr instance,
+        IntPtr storage, //string
+        IntPtr passwordGenerator, //PasswordGenerator
+        IntPtr ignoreIfNotReadable, //bool
+        IntPtr methodInfo)
+    {
+        //no clue matthew help
+        var storagePath = IL2CPP.PointerToValueGeneric<IStorage>(storage, false, false);
+        var logger = Melon<Mod>.Logger;
+        logger.Msg("type: " + storagePath.GetType().FullName);
+
+        var filePath = IL2CPP.PointerToValueGeneric<IStorage>(storage, false, false);
+
+        if (filePath != null)
+        {
+            if (!string.IsNullOrEmpty(ProfileName) && filePath.Name.EndsWith(IdentityFileName))
+            {
+                var newFileName = Path.Combine(Path.GetDirectoryName(filePath.Name), $"{IdentityFileName}-{ProfileName}");
+                //storagePath.Name = IL2CPP.ManagedStringToIl2Cpp(newFileName);
                 MelonLogger.Msg($"Redirecting Identity file: {newFileName}");
-            } else if (!string.IsNullOrEmpty(SaveName) && filePath.EndsWith(SaveFileName)) {
-                var newFileName = Path.Combine(Path.GetDirectoryName(filePath), $"{SaveFileName}.{SaveName}");
-                path.RawValue = IL2CPP.ManagedStringToIl2Cpp(newFileName);
+            }
+            else if (!string.IsNullOrEmpty(SaveName) && filePath.Name.EndsWith(SaveFileName))
+            {
+                var newFileName = Path.Combine(Path.GetDirectoryName(filePath.Name), $"{SaveFileName}.{SaveName}");
+                //path = IL2CPP.ManagedStringToIl2Cpp(newFileName);
                 MelonLogger.Msg($"Redirecting Save file: {newFileName}");
             }
         }
 
-        return new();
-        //return m_fileStorageNativeHook.Trampoline(path, passwordGenerator, jsonSettings, saveStrategy, ignoreIfNotReadable, method);
+        return _hook.Trampoline.Invoke(instance, storage, passwordGenerator, ignoreIfNotReadable, methodInfo);
     }
+
+    public static unsafe void OnLateInitializeMelon()
+    {
+        // Getting the IntPtr for our target method with GetIl2CppMethodInfoPointerFieldForGeneratedMethod
+        var method = AccessTools.Method(typeof(FileStorage), nameof(FileStorage.LoadStorage), [
+            typeof(IStorage),
+            typeof(PasswordGenerator),
+            typeof(JsonSerializerSettings),
+            typeof(bool)
+        ], [typeof(Identity)]);
+
+        if (method == null)
+        {
+            MelonLogger.Error("Failed to find method");
+            foreach (var declaredMethod in AccessTools.GetDeclaredMethods(typeof(FileStorage)))
+            {
+                MelonLogger.Msg(declaredMethod.Name);
+                foreach (var VARIABLE in declaredMethod.GetParameters())
+                {
+                    MelonLogger.Msg(VARIABLE.Name + " : " + VARIABLE.ParameterType);
+                }
+            }
+
+            return;
+        }
+
+        IntPtr originalMethod = *(IntPtr*)(IntPtr)Il2CppInteropUtils
+            .GetIl2CppMethodInfoPointerFieldForGeneratedMethod(method).GetValue(null);
+
+        _patchDelegate = LoadStorage;
+
+        IntPtr delegatePointer = Marshal.GetFunctionPointerForDelegate(_patchDelegate);
+
+        NativeHook<LoadStorageDelegate> hook = new NativeHook<LoadStorageDelegate>(originalMethod, delegatePointer);
+        //hook.Attach();
+        _hook = hook;
+    }
+
 
     /// <summary>
     /// Sanitizes a file name such that it can be written to a file.
