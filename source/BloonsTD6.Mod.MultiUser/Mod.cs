@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using AssetsTools.NET.Extra;
 using BloonsTD6.Mod.MultiUser;
 using BTD_Mod_Helper.Extensions;
+using Il2CppInterop.Common;
+using MelonLoader.NativeUtils;
 using MelonLoader.Utils;
 
 [assembly: MelonInfo(typeof(Mod), "Multi User", "1.0.0", "Sewer56")]
@@ -18,17 +19,27 @@ namespace BloonsTD6.Mod.MultiUser;
 [ExcludeFromCodeCoverage] // game specific code
 public class Mod : BloonsTD6Mod
 {
-    public override void OnApplicationStart()
+    public override void OnInitialize()
     {
-        ProfileSwitcher.Initialize();
+        var bootConfigPath = Path.Combine(MelonEnvironment.UnityGameDataDirectory, "boot.config");
 
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        var lines = File.ReadAllLines(bootConfigPath).ToList();
+        for (int i = 0; i < lines.Count; i++)
         {
-            MelonLogger.Warning("OS is not Windows. Skipping patching UnityPlayer. You'll only be able to run 1 game copy at once.");
-            return;
+            if (lines[i].StartsWith("single-instance"))
+            {
+                lines.RemoveAt(i);
+                MelonLogger.Msg("Successfully enabled multi-instance.");
+                break;
+            }
         }
+        File.WriteAllLines(bootConfigPath, lines);
 
-        var versionPath = Path.Combine(this.GetModSettingsDir(true), "multiuser-version.txt");
-        UnityPlayerPatcher.PatchIfNecessary(versionPath, MelonEnvironment.GameRootDirectory);
+        ProfileSwitcher.Initialize();
+    }
+
+    public override void OnLateInitializeMelon()
+    {
+        ProfileSwitcher.OnLateInitializeMelon();
     }
 }
