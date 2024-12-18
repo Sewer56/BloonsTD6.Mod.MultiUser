@@ -6,5 +6,5 @@ public static class ModHelperData {
     internal const string RepoOwner = "Sewer56";
     internal const string RepoName = "BloonsTD6.Mod.MultiUser";
     internal const string WorksOnVersion = "46.1";
-    internal const string Author = "Matthew Guerra & GrahamKracker";
+    internal const string Author = "Matthew & GrahamKracker";
 }
