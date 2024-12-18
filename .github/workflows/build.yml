@@ -107,7 +107,7 @@ jobs:
 
 
       - name: Build
-        run: dotnet build -c Release -p:BloonsTD6="../../${{ env.BLOONSTD6 }}" "BloonsTD6.Mod.MultiUser/source/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj"
+        run: dotnet build -c Release -p:BloonsTD6="../../../${{ env.BLOONSTD6 }}" "BloonsTD6.Mod.MultiUser/source/${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}.csproj"
 
 
       - name: Upload Mod DLL
