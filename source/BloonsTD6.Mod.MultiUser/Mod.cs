@@ -19,7 +19,7 @@ namespace BloonsTD6.Mod.MultiUser;
 [ExcludeFromCodeCoverage] // game specific code
 public class Mod : BloonsTD6Mod
 {
-    public override void OnInitialize()
+    public override void OnEarlyInitialize()
     {
         var bootConfigPath = Path.Combine(MelonEnvironment.UnityGameDataDirectory, "boot.config");
 

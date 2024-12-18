@@ -17,7 +17,6 @@
     <Reference Include="Il2CppNinjaKiwi.LiNK">
       <HintPath>$(BloonsTD6)\MelonLoader\Il2CppAssemblies\Il2CppNinjaKiwi.LiNK.dll</HintPath>
     </Reference>
-    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.29" />
   </ItemGroup>
 
   <Import Project="..\..\..\btd6.targets" />
