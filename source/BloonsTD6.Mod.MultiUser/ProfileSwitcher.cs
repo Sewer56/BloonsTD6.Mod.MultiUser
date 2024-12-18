@@ -1,17 +1,18 @@
 ﻿using System.Runtime.InteropServices;
 
 using HarmonyLib;
-using Il2CppAssets.Scripts.Unity;
-using Il2CppAssets.Scripts.Utils;
+
 using Il2CppInterop.Runtime;
 
 using Il2CppNewtonsoft.Json;
-using Il2CppNinjaKiwi.LiNK.Authentication;
+
 using Il2CppNinjaKiwi.LiNK.Client;
 using Il2CppNinjaKiwi.LiNK.Client.Files;
 
 using Il2CppSystem.Runtime.Remoting;
+
 using MelonLoader.NativeUtils;
+using MelonLoader.Utils;
 using Il2CppInteropUtils = Il2CppInterop.Common.Il2CppInteropUtils;
 
 namespace BloonsTD6.Mod.MultiUser;
@@ -29,7 +30,7 @@ internal static class ProfileSwitcher {
 
     public const string IdentityFileName = "identity";
     public const string SaveFileName = "Profile.Save";
-    
+
     /// <summary>
     /// Initializes this class instance.
     /// </summary>
@@ -44,10 +45,23 @@ internal static class ProfileSwitcher {
         }
     }
 
+    [HarmonyPatch(typeof(PlayerServiceComponent), nameof(PlayerServiceComponent.Awake))]
+    public static class PlayerServiceComponent_Awake {
+        [HarmonyPrefix]
+        public static bool Prefix(ref PlayerServiceComponent __instance) {
+            if (string.IsNullOrEmpty(SaveName))
+                return true;
+            var root = Path.Combine(MelonEnvironment.GameRootDirectory, "MultiUser");
+            __instance.configuration.playerSaveFileName = $"{SaveName}-{SaveFileName}";
+            __instance.configuration.playerDataRootPath = root;
+            return true;
+        }
+    }
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr LoadStorageDelegate(
-        IntPtr instance,
-        IntPtr path, //string
+        IntPtr storage, //IStorage
+        IntPtr passwordGenerator, //PasswordGenerator
         IntPtr jsonSettings, //JsonSerializerSettings
         IntPtr ignoreIfNotReadable, //bool
         IntPtr methodInfo
@@ -56,40 +70,27 @@ internal static class ProfileSwitcher {
     private static NativeHook<LoadStorageDelegate> _hook;
     private static LoadStorageDelegate _patchDelegate;
 
-    public static IntPtr LoadStorage(IntPtr instance,
-        IntPtr storage, //string
+    public static IntPtr LoadStorage(IntPtr storage, //IStorage
         IntPtr passwordGenerator, //PasswordGenerator
+        IntPtr jsonSettings, //JsonSerializerSettings
         IntPtr ignoreIfNotReadable, //bool
-        IntPtr methodInfo)
-    {
-        //no clue matthew help
-        var storagePath = IL2CPP.PointerToValueGeneric<IStorage>(storage, false, false);
-        var logger = Melon<Mod>.Logger;
-        logger.Msg("type: " + storagePath.GetType().FullName);
-
+        IntPtr methodInfo) {
         var filePath = IL2CPP.PointerToValueGeneric<IStorage>(storage, false, false);
 
-        if (filePath != null)
-        {
-            if (!string.IsNullOrEmpty(ProfileName) && filePath.Name.EndsWith(IdentityFileName))
-            {
-                var newFileName = Path.Combine(Path.GetDirectoryName(filePath.Name), $"{IdentityFileName}-{ProfileName}");
-                //storagePath.Name = IL2CPP.ManagedStringToIl2Cpp(newFileName);
-                MelonLogger.Msg($"Redirecting Identity file: {newFileName}");
-            }
-            else if (!string.IsNullOrEmpty(SaveName) && filePath.Name.EndsWith(SaveFileName))
-            {
-                var newFileName = Path.Combine(Path.GetDirectoryName(filePath.Name), $"{SaveFileName}.{SaveName}");
-                //path = IL2CPP.ManagedStringToIl2Cpp(newFileName);
-                MelonLogger.Msg($"Redirecting Save file: {newFileName}");
-            }
-        }
+        if (filePath == null || string.IsNullOrEmpty(ProfileName) || !filePath.Name.EndsWith(IdentityFileName))
+            goto ending;
+        
+        var newFileName = Path.Combine(MelonEnvironment.GameRootDirectory, "MultiUser", $"{IdentityFileName}-{ProfileName}");
 
-        return _hook.Trampoline.Invoke(instance, storage, passwordGenerator, ignoreIfNotReadable, methodInfo);
+        storage = FileSystemStorage.CreateStorage(newFileName, FileSystemStorage.Strategy.Basic).Pointer;
+        MelonLogger.Msg($"Redirecting Identity file: {newFileName}");
+
+        ending:
+
+        return _hook.Trampoline.Invoke(storage, passwordGenerator, jsonSettings, ignoreIfNotReadable, methodInfo);
     }
 
-    public static unsafe void OnLateInitializeMelon()
-    {
+    public static unsafe void OnLateInitializeMelon() {
         // Getting the IntPtr for our target method with GetIl2CppMethodInfoPointerFieldForGeneratedMethod
         var method = AccessTools.Method(typeof(FileStorage), nameof(FileStorage.LoadStorage), [
             typeof(IStorage),
@@ -98,14 +99,11 @@ internal static class ProfileSwitcher {
             typeof(bool)
         ], [typeof(Identity)]);
 
-        if (method == null)
-        {
+        if (method == null) {
             MelonLogger.Error("Failed to find method");
-            foreach (var declaredMethod in AccessTools.GetDeclaredMethods(typeof(FileStorage)))
-            {
+            foreach (var declaredMethod in AccessTools.GetDeclaredMethods(typeof(FileStorage))) {
                 MelonLogger.Msg(declaredMethod.Name);
-                foreach (var VARIABLE in declaredMethod.GetParameters())
-                {
+                foreach (var VARIABLE in declaredMethod.GetParameters()) {
                     MelonLogger.Msg(VARIABLE.Name + " : " + VARIABLE.ParameterType);
                 }
             }
@@ -121,7 +119,7 @@ internal static class ProfileSwitcher {
         IntPtr delegatePointer = Marshal.GetFunctionPointerForDelegate(_patchDelegate);
 
         NativeHook<LoadStorageDelegate> hook = new NativeHook<LoadStorageDelegate>(originalMethod, delegatePointer);
-        //hook.Attach();
+        hook.Attach();
         _hook = hook;
     }
 
